@@ -142,6 +142,20 @@
             overflow-y: auto;
             font-size: 0.9em;
             line-height: 1.6;
+            font-family: inherit;  
+            width: 100%;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        textarea.content-area {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        textarea.content-area:focus {
+            outline: none;
+            border-color: var(--secondary-color);
         }
 
         #llmResponse {
@@ -157,6 +171,38 @@
 
         .section-title svg {
             margin-right: 10px;
+        }
+        .disclaimer-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .disclaimer-toggle {
+            color: var(--primary-color);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .disclaimer-content {
+            display: none;
+            background-color: var(--card-background);
+            border: 1px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 10px;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .disclaimer-content h1 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .disclaimer-content p, .disclaimer-content ol {
+            font-size: 0.9em;
+            line-height: 1.6;
         }
 
         footer {
@@ -185,8 +231,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>VoiceAI Transcriber</h1>
-            <p class="app-description">Transform your speech into text and interact with AI - all in your browser!</p>
+            <h1>Ai Medical Scribe</h1>
+            <p class="app-description">Transcribe speech into medical note - all in your browser!</p>
         </header>
         <div class="app-layout">
             <div class="transcription-section">
@@ -217,7 +263,7 @@
                         </svg>
                         Transcription
                     </h2>
-                    <div id="transcription" class="content-area"></div>
+                    <textarea id="transcription" class="content-area"></textarea>
                 </div>
             </div>
             <div class="llm-section">
@@ -228,9 +274,9 @@
                             <path d="M22 22L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M15 8C14.0054 8 13.0516 8.39588 12.3483 9.10041C11.6451 9.80494 11.25 10.7613 11.25 11.7586C11.25 12.7559 11.6451 13.7123 12.3483 14.4168C13.0516 15.1213 14.0054 15.5172 15 15.5172C15.9946 15.5172 16.9484 15.1213 17.6517 14.4168C18.3549 13.7123 18.75 12.7559 18.75 11.7586C18.75 10.7613 18.3549 9.80494 17.6517 9.10041C16.9484 8.39588 15.9946 8 15 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        AI Interaction
+                        Medical Note
                     </h2>
-                    <button id="sendToLLM" disabled>
+                    <button id="Create Note" disabled>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor"/>
                         </svg>
@@ -240,6 +286,27 @@
                 </div>
             </div>
         </div>
+        <div class="disclaimer-container">
+        <span class="disclaimer-toggle">Read terms of use before proceeding. Click here to read.</span>
+        <div class="disclaimer-content">
+            <h1>Disclaimer: AI-Assisted Medical Note Creator</h1>
+            <p>This AI-assisted medical note creation tool is designed to support healthcare professionals in documenting patient encounters. Please read and understand the following important information:</p>
+            <ol>
+                <li><strong>Intended Use</strong>: This tool is intended for use by licensed healthcare professionals only. It is designed to assist in the creation of medical notes, not to replace professional medical judgment or decision-making.</li>
+                <li><strong>AI Limitations</strong>: The AI system used in this tool is based on machine learning algorithms and may not always produce accurate or complete information. It is not capable of independent medical reasoning or diagnosis. AI hallucinate or generate wrong information or omit information.</li>
+                <li><strong>User Responsibility</strong>: The healthcare professional using this tool is solely responsible for the content, accuracy, and completeness of all medical notes. All AI-generated content must be thoroughly reviewed, verified, and edited as necessary before being incorporated into official medical records.</li>
+                <li><strong>Not a Diagnostic Tool</strong>: This AI system is not designed to make medical diagnoses or treatment recommendations. Any such information that may be generated should be considered as suggestions only and must be independently verified by the healthcare professional.</li>
+                <li><strong>Privacy and Security</strong>: While this site is able to run locally in the bowser once the models are downloaded, users are responsible for ensuring compliance with all applicable privacy laws and regulations, including HIPAA (Health Insurance Portability and Accountability Act) in the United States and other applicable laws and regulation in all regions where this is used. Make sure this tool can be used in your region and in your institution before using this tool.</li>
+                <li><strong>No Substitute for Professional Judgment</strong>: This tool should never be used as a substitute for professional medical judgment. Healthcare professionals should rely on their training, experience, and direct patient evaluation when making clinical decisions.</li>
+                <li><strong>Continuous Learning</strong>: The AI model may be updated periodically. Users should stay informed about any changes or improvements to the system and adjust their usage accordingly.</li>
+                <li><strong>Errors and Omissions</strong>: Neither the developers of this tool nor the model creators are liable for any errors, omissions, or consequences arising from the use of this tool.</li>
+                <li><strong>Training and Familiarization</strong>: Healthcare professionals should undergo appropriate training and familiarization with this tool before using it in clinical practice.</li>
+            </ol>
+            <p>By using this AI-assisted medical note creation tool, you acknowledge that you have read, understood, and agree to the terms outlined in this disclaimer. Remember, the ultimate responsibility for patient care and documentation lies with the healthcare professional.</p>
+            <p>Whisper model license: <a href="https://github.com/openai/whisper/blob/main/LICENSE" target="_blank">https://github.com/openai/whisper/blob/main/LICENSE</a></p>
+            <p>To learn more about Chrome Built-in AI visit - <a href="https://developer.chrome.com/docs/ai/built-in" target="_blank">https://developer.chrome.com/docs/ai/built-in</a></p>
+        </div>
+    </div>
     </div>
     <footer>
         <p>GitHub Repo: <a href="https://github.com/johnyquest7/whisper_chrome_ai">https://github.com/johnyquest7/whisper_chrome_ai</a></p> 
@@ -347,7 +414,7 @@
                     return_timestamps: true
                 });
 
-                transcription.textContent = 'Transcription: ' + result.text;
+                transcription.value = 'Transcription: ' + result.text;
                 status.textContent = 'Transcription complete.';
                 sendToLLM.disabled = false;
             } catch (error) {
@@ -424,7 +491,7 @@
                 status.textContent = 'Sending to LLM...';
                 sendToLLM.disabled = true;
                 
-                const prompt = `Please respond to the following transcribed text: "${transcriptionText}"`;
+                const prompt = `Convert the following medical transcript to a structured medical note. Transcript: "${transcriptionText}"`;
                 
                 llmResponse.value = ''; // Clear previous response
                 
@@ -450,7 +517,17 @@
                 status.textContent = 'Error: LLM interaction is not available.';
                 sendToLLM.disabled = false;
             }
-        });
+        }
+        const disclaimerToggle = document.querySelector('.disclaimer-toggle');
+        const disclaimerContent = document.querySelector('.disclaimer-content');
+
+        disclaimerToggle.addEventListener('click', () => {
+            if (disclaimerContent.style.display === 'none' || disclaimerContent.style.display === '') {
+                disclaimerContent.style.display = 'block';
+            } else {
+                disclaimerContent.style.display = 'none';
+            }
+        });                          
     </script>
 </body>
 </html>
