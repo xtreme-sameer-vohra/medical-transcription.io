@@ -276,11 +276,11 @@
                         </svg>
                         Medical Note
                     </h2>
-                    <button id="Create Note" disabled>
+                    <button id="sendToLLM" disabled>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor"/>
                         </svg>
-                        Send to AI
+                        Create Medical Note
                     </button>
                     <textarea id="llmResponse" class="content-area" readonly></textarea>
                 </div>
@@ -527,7 +527,7 @@
             } else {
                 disclaimerContent.style.display = 'none';
             }
-        });                          
+        };                          
     </script>
 </body>
 </html>
