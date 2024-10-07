@@ -453,7 +453,7 @@
         }
 
         sendToLLM.addEventListener('click', async () => {
-            const transcriptionText = transcription.textContent.replace('Transcription: ', '');
+            const transcriptionText = transcription.value.replace('Transcription: ', '');
             
             try {
                 status.textContent = 'Checking LLM availability...';
@@ -498,7 +498,7 @@
                 try {
                     const stream = await session.promptStreaming(prompt);
                     for await (const chunk of stream) {
-                        llmResponse.value = chunk.trim();
+                        llmResponse.value += chunk.trim();
                     }
                     
                     status.textContent = 'LLM response complete.';
@@ -517,7 +517,8 @@
                 status.textContent = 'Error: LLM interaction is not available.';
                 sendToLLM.disabled = false;
             }
-        }
+        });
+
         const disclaimerToggle = document.querySelector('.disclaimer-toggle');
         const disclaimerContent = document.querySelector('.disclaimer-content');
 
@@ -527,7 +528,7 @@
             } else {
                 disclaimerContent.style.display = 'none';
             }
-        };                          
+        });
     </script>
 </body>
 </html>
