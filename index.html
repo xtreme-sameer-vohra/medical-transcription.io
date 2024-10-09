@@ -458,11 +458,11 @@
             try {
                 status.textContent = 'Checking LLM availability...';
                 
-                if (!window.ai || !window.ai.assistant) {
-                    throw new Error('window.ai.assistant API is not available.');
+                if (!ai || !ai.assistant) {
+                    throw new Error('ai.assistant API is not available.');
                 }
 
-                const { available } = await window.ai.assistant.capabilities();
+                const { available } = await ai.assistant.capabilities();
                 
                 if (available === "no") {
                     throw new Error('LLM is not available on this device.');
@@ -471,7 +471,7 @@
                 status.textContent = 'Creating LLM session...';
                 let session;
                 try {
-                    session = await window.ai.assistant.create({
+                    session = await ai.assistant.create({
                         temperature: 0.1,
                         topK: 3,
                         monitor(m) {
