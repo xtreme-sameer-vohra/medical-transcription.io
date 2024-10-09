@@ -454,14 +454,10 @@
 
         sendToLLM.addEventListener('click', async () => {
             const transcriptionText = transcription.value.replace('Transcription: ', '');
-            
+
             try {
                 status.textContent = 'Checking LLM availability...';
                 
-                if (!ai || !ai.assistant) {
-                    throw new Error('ai.assistant API is not available.');
-                }
-
                 const { available } = await ai.assistant.capabilities();
                 
                 if (available === "no") {
@@ -469,6 +465,7 @@
                 }
 
                 status.textContent = 'Creating LLM session...';
+
                 let session;
                 try {
                     session = await ai.assistant.create({
