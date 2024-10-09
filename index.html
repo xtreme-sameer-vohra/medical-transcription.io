@@ -451,21 +451,15 @@
 
         draw();
     }
-
     sendToLLM.addEventListener('click', async () => {
         const transcriptionText = transcription.value.replace('Transcription: ', '');
-    
         try {
             status.textContent = 'Checking LLM availability...';
-    
             const { available } = await ai.assistant.capabilities();
-    
             if (available === "no") {
                 throw new Error('LLM is not available on this device.');
             }
-    
             status.textContent = 'Creating LLM session...';
-    
             let session;
             try {
                 session = await ai.assistant.create({
@@ -484,22 +478,14 @@
                 sendToLLM.disabled = false;
                 return;
             }
-    
             status.textContent = 'Sending to LLM...';
             sendToLLM.disabled = true;
-    
             const prompt = `Convert the following medical transcript to a structured medical note. Transcript: "${transcriptionText}"`;
-    
             llmResponse.value = ''; // Clear previous response
-    
             try {
                 let tempResponse = ''; // Temporary string to store response content
                 const result = await session.prompt(prompt);
-                }
-    
-                // Once all chunks are received, update the final response value
-                llmResponse.value = result;
-    
+                llmResponse.value = result; // Once all chunks are received, update the final response value
                 status.textContent = 'LLM response complete.';
             } catch (error) {
                 console.error('Error during LLM interaction:', error);
@@ -517,6 +503,7 @@
             sendToLLM.disabled = false;
         }
     });
+       
 
 </script>
 </body>
