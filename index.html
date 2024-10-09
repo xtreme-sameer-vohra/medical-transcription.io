@@ -494,13 +494,11 @@
         
                 try {
                     let tempResponse = ''; // Temporary string to store response content
-                    const stream = await session.promptStreaming(prompt);
-                    for await (const chunk of stream) {
-                        tempResponse += chunk.trim();
+                    const result = await session.prompt(prompt);
                     }
         
                     // Once all chunks are received, update the final response value
-                    llmResponse.value = tempResponse;
+                    llmResponse.value = result;
         
                     status.textContent = 'LLM response complete.';
                 } catch (error) {
