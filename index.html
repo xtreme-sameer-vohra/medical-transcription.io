@@ -312,212 +312,212 @@
         <p>GitHub Repo: <a href="https://github.com/johnyquest7/whisper_chrome_ai">https://github.com/johnyquest7/whisper_chrome_ai</a></p> 
     </footer>
 
-    <script type="module">
-        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.1';
+<script type="module">
+    import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.1';
 
-        env.allowLocalModels = false;
-        env.remoteModels = {
-            'Xenova/whisper-tiny': 'https://huggingface.co/Xenova/whisper-tiny/resolve/main/'
-        };
+    env.allowLocalModels = false;
+    env.remoteModels = {
+        'Xenova/whisper-tiny': 'https://huggingface.co/Xenova/whisper-tiny/resolve/main/'
+    };
 
-        let mediaRecorder;
-        let audioChunks = [];
-        let transcriber;
-        let audioContext;
-        let analyser;
-        let visualizer;
-        let visualizerContext;
+    let mediaRecorder;
+    let audioChunks = [];
+    let transcriber;
+    let audioContext;
+    let analyser;
+    let visualizer;
+    let visualizerContext;
 
-        const startRecord = document.getElementById('startRecord');
-        const stopRecord = document.getElementById('stopRecord');
-        const status = document.getElementById('status');
-        const transcription = document.getElementById('transcription');
-        const sendToLLM = document.getElementById('sendToLLM');
-        const llmResponse = document.getElementById('llmResponse');
-        visualizer = document.getElementById('visualizer');
-        visualizerContext = visualizer.getContext('2d');
+    const startRecord = document.getElementById('startRecord');
+    const stopRecord = document.getElementById('stopRecord');
+    const status = document.getElementById('status');
+    const transcription = document.getElementById('transcription');
+    const sendToLLM = document.getElementById('sendToLLM');
+    const llmResponse = document.getElementById('llmResponse');
+    visualizer = document.getElementById('visualizer');
+    visualizerContext = visualizer.getContext('2d');
 
-        (async function loadModel() {
-            try {
-                status.textContent = 'Loading model...';
-                transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny');
-                status.textContent = 'Model loaded. Ready to record.';
-                startRecord.disabled = false;
-            } catch (error) {
-                console.error('Error loading model:', error);
-                status.textContent = 'Error: Unable to load the model.';
+    (async function loadModel() {
+        try {
+            status.textContent = 'Loading model...';
+            transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny');
+            status.textContent = 'Model loaded. Ready to record.';
+            startRecord.disabled = false;
+        } catch (error) {
+            console.error('Error loading model:', error);
+            status.textContent = 'Error: Unable to load the model.';
+        }
+    })();
+
+    startRecord.addEventListener('click', async () => {
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            mediaRecorder.start();
+
+            status.textContent = 'Recording... (speak for at least 5 seconds)';
+            startRecord.disabled = true;
+            stopRecord.disabled = false;
+            sendToLLM.disabled = true;
+
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+
+            visualize();
+        } catch (error) {
+            console.error('Error starting recording:', error);
+            status.textContent = 'Error: Unable to access microphone';
+        }
+    });
+
+    stopRecord.addEventListener('click', () => {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            status.textContent = 'Processing...';
+            startRecord.disabled = false;
+            stopRecord.disabled = true;
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                audioChunks = [];
+                await transcribeAudio(audioBlob);
+            };
+        }
+    });
+
+    async function transcribeAudio(audioBlob) {
+        try {
+            const arrayBuffer = await audioBlob.arrayBuffer();
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            
+            const offlineContext = new OfflineAudioContext(1, audioBuffer.duration * 16000, 16000);
+            const source = offlineContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(offlineContext.destination);
+            source.start();
+            const resampled = await offlineContext.startRendering();
+
+            const float32Array = resampled.getChannelData(0);
+
+            const result = await transcriber(float32Array, {
+                chunk_length_s: 30,
+                stride_length_s: 5,
+                language: 'english',
+                task: 'transcribe',
+                sampling_rate: 16000,
+                return_timestamps: true
+            });
+
+            transcription.value = 'Transcription: ' + result.text;
+            status.textContent = 'Transcription complete.';
+            sendToLLM.disabled = false;
+        } catch (error) {
+            console.error('Transcription error:', error);
+            status.textContent = 'Error during transcription.';
+        }
+    }
+
+    function visualize() {
+        const WIDTH = visualizer.width;
+        const HEIGHT = visualizer.height;
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        visualizerContext.clearRect(0, 0, WIDTH, HEIGHT);
+
+        function draw() {
+            const drawVisual = requestAnimationFrame(draw);
+            analyser.getByteFrequencyData(dataArray);
+            visualizerContext.fillStyle = 'rgb(200, 200, 200)';
+            visualizerContext.fillRect(0, 0, WIDTH, HEIGHT);
+            const barWidth = (WIDTH / bufferLength) * 2.5;
+            let barHeight;
+            let x = 0;
+
+            for(let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 2;
+                visualizerContext.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
+                visualizerContext.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight);
+                x += barWidth + 1;
             }
-        })();
+        }
 
-        startRecord.addEventListener('click', async () => {
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                analyser = audioContext.createAnalyser();
-                const source = audioContext.createMediaStreamSource(stream);
-                source.connect(analyser);
+        draw();
+    }
 
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-                mediaRecorder.start();
-
-                status.textContent = 'Recording... (speak for at least 5 seconds)';
-                startRecord.disabled = true;
-                stopRecord.disabled = false;
-                sendToLLM.disabled = true;
-
-                mediaRecorder.ondataavailable = (event) => {
-                    audioChunks.push(event.data);
-                };
-
-                visualize();
-            } catch (error) {
-                console.error('Error starting recording:', error);
-                status.textContent = 'Error: Unable to access microphone';
+    sendToLLM.addEventListener('click', async () => {
+        const transcriptionText = transcription.value.replace('Transcription: ', '');
+    
+        try {
+            status.textContent = 'Checking LLM availability...';
+    
+            const { available } = await ai.assistant.capabilities();
+    
+            if (available === "no") {
+                throw new Error('LLM is not available on this device.');
             }
-        });
-
-        stopRecord.addEventListener('click', () => {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                status.textContent = 'Processing...';
-                startRecord.disabled = false;
-                stopRecord.disabled = true;
-
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    audioChunks = [];
-                    await transcribeAudio(audioBlob);
-                };
-            }
-        });
-
-        async function transcribeAudio(audioBlob) {
+    
+            status.textContent = 'Creating LLM session...';
+    
+            let session;
             try {
-                const arrayBuffer = await audioBlob.arrayBuffer();
-                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                
-                const offlineContext = new OfflineAudioContext(1, audioBuffer.duration * 16000, 16000);
-                const source = offlineContext.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(offlineContext.destination);
-                source.start();
-                const resampled = await offlineContext.startRendering();
-
-                const float32Array = resampled.getChannelData(0);
-
-                const result = await transcriber(float32Array, {
-                    chunk_length_s: 30,
-                    stride_length_s: 5,
-                    language: 'english',
-                    task: 'transcribe',
-                    sampling_rate: 16000,
-                    return_timestamps: true
+                session = await ai.assistant.create({
+                    temperature: 0.1,
+                    topK: 3,
+                    monitor(m) {
+                        m.addEventListener("downloadprogress", e => {
+                            const percentage = Math.round((e.loaded / e.total) * 100);
+                            status.textContent = `Downloading LLM... ${percentage}%`;
+                        });
+                    }
                 });
-
-                transcription.value = 'Transcription: ' + result.text;
-                status.textContent = 'Transcription complete.';
-                sendToLLM.disabled = false;
             } catch (error) {
-                console.error('Transcription error:', error);
-                status.textContent = 'Error during transcription.';
+                console.error('Error creating assistant session:', error);
+                status.textContent = 'Error: Unable to create LLM session.';
+                sendToLLM.disabled = false;
+                return;
             }
-        }
-
-        function visualize() {
-            const WIDTH = visualizer.width;
-            const HEIGHT = visualizer.height;
-            analyser.fftSize = 256;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-
-            visualizerContext.clearRect(0, 0, WIDTH, HEIGHT);
-
-            function draw() {
-                const drawVisual = requestAnimationFrame(draw);
-                analyser.getByteFrequencyData(dataArray);
-                visualizerContext.fillStyle = 'rgb(200, 200, 200)';
-                visualizerContext.fillRect(0, 0, WIDTH, HEIGHT);
-                const barWidth = (WIDTH / bufferLength) * 2.5;
-                let barHeight;
-                let x = 0;
-
-                for(let i = 0; i < bufferLength; i++) {
-                    barHeight = dataArray[i] / 2;
-                    visualizerContext.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
-                    visualizerContext.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight);
-                    x += barWidth + 1;
-                }
-            }
-
-            draw();
-        }
-
-        sendToLLM.addEventListener('click', async () => {
-            const transcriptionText = transcription.value.replace('Transcription: ', '');
-        
+    
+            status.textContent = 'Sending to LLM...';
+            sendToLLM.disabled = true;
+    
+            const prompt = `Convert the following medical transcript to a structured medical note. Transcript: "${transcriptionText}"`;
+    
+            llmResponse.value = ''; // Clear previous response
+    
             try {
-                status.textContent = 'Checking LLM availability...';
-        
-                const { available } = await ai.assistant.capabilities();
-        
-                if (available === "no") {
-                    throw new Error('LLM is not available on this device.');
+                let tempResponse = ''; // Temporary string to store response content
+                const result = await session.prompt(prompt);
                 }
-        
-                status.textContent = 'Creating LLM session...';
-        
-                let session;
-                try {
-                    session = await ai.assistant.create({
-                        temperature: 0.1,
-                        topK: 3,
-                        monitor(m) {
-                            m.addEventListener("downloadprogress", e => {
-                                const percentage = Math.round((e.loaded / e.total) * 100);
-                                status.textContent = `Downloading LLM... ${percentage}%`;
-                            });
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error creating assistant session:', error);
-                    status.textContent = 'Error: Unable to create LLM session.';
-                    sendToLLM.disabled = false;
-                    return;
-                }
-        
-                status.textContent = 'Sending to LLM...';
-                sendToLLM.disabled = true;
-        
-                const prompt = `Convert the following medical transcript to a structured medical note. Transcript: "${transcriptionText}"`;
-        
-                llmResponse.value = ''; // Clear previous response
-        
-                try {
-                    let tempResponse = ''; // Temporary string to store response content
-                    const result = await session.prompt(prompt);
-                    }
-        
-                    // Once all chunks are received, update the final response value
-                    llmResponse.value = result;
-        
-                    status.textContent = 'LLM response complete.';
-                } catch (error) {
-                    console.error('Error during LLM interaction:', error);
-                    status.textContent = 'Error: Failed to get LLM response.';
-                    llmResponse.value = 'An error occurred while processing your request.';
-                } finally {
-                    sendToLLM.disabled = false;
-                    if (session && typeof session.destroy === 'function') {
-                        session.destroy();
-                    }
-                }
+    
+                // Once all chunks are received, update the final response value
+                llmResponse.value = result;
+    
+                status.textContent = 'LLM response complete.';
             } catch (error) {
-                console.error('Error interacting with LLM:', error);
-                status.textContent = 'Error: LLM interaction is not available.';
+                console.error('Error during LLM interaction:', error);
+                status.textContent = 'Error: Failed to get LLM response.';
+                llmResponse.value = 'An error occurred while processing your request.';
+            } finally {
                 sendToLLM.disabled = false;
+                if (session && typeof session.destroy === 'function') {
+                    session.destroy();
+                }
             }
-        });
+        } catch (error) {
+            console.error('Error interacting with LLM:', error);
+            status.textContent = 'Error: LLM interaction is not available.';
+            sendToLLM.disabled = false;
+        }
+    });
 
-    </script>
+</script>
 </body>
 </html>
