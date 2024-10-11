@@ -502,6 +502,9 @@
             status.textContent = 'Error: LLM interaction is not available.';
             sendToLLM.disabled = false;
         }
+        document.querySelector('.disclaimer-toggle').addEventListener('click', function() {
+            const disclaimerContent = document.querySelector('.disclaimer-content');
+            disclaimerContent.style.display = disclaimerContent.style.display === 'none' ? 'block' : 'none';
     });
        
 
