@@ -485,7 +485,7 @@
                 llmResponse.value = ''; // Clear previous response
                 try {
                     const result = await session.prompt(prompt);
-                    llmResponse.value = result; // Once all chunks are received, update the final response value
+                    llmResponse.value = result;  
                     console.log('LLM Response:', result);
                     status.textContent = 'LLM response complete.';
                 } catch (error) {
