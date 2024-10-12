@@ -486,6 +486,7 @@
                 try {
                     const result = await session.prompt(prompt);
                     llmResponse.value = result; // Once all chunks are received, update the final response value
+                    console.log('LLM Response:', result);
                     status.textContent = 'LLM response complete.';
                 } catch (error) {
                     console.error('Error during LLM interaction:', error);
