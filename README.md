@@ -20,10 +20,10 @@ VoiceAI Transcriber is a web application designed to assist healthcare professio
 ## Getting Started
 To use the VoiceAI Transcriber:
 1. Open the application in a Chrome version greater than v127 or chrome Canary.
-   a. Download and install Chrome with built-in AI(Dev / Canary).
-   b. Go to chrome://flags/#prompt-api-for-gemini-nano and enable the Prompt API for Gemini Nano option.
-   c. Go to chrome://flags/#optimization-guide-on-device-model and turn on the Enables optimization guide on device option.
-   d. Go to chrome://components/ and check or download the latest version of Optimization Guide On Device Model.
+   1. Download and install Chrome with built-in AI(Dev / Canary).
+   1. Go to chrome://flags/#prompt-api-for-gemini-nano and enable the Prompt API for Gemini Nano option.
+   1. Go to chrome://flags/#optimization-guide-on-device-model and turn on the Enables optimization guide on device option.
+   1. Go to chrome://components/ and check or download the latest version of Optimization Guide On Device Model.
 2. Click **Start Recording** to begin recording your voice input.
 3. Click **Stop Recording** once you are done speaking.
 4. The transcription of your speech will appear in the **Transcription** section.
@@ -41,6 +41,3 @@ This tool is an AI-assisted medical note creator, designed to support healthcare
 This application utilizes the Whisper model, licensed by OpenAI. Please refer to the Whisper model license: [Whisper License](https://github.com/openai/whisper/blob/main/LICENSE)
 
 For more information on Chrome's built-in AI features, visit: [Chrome Built-in AI](https://developer.chrome.com/docs/ai/built-in)
-
-
-
