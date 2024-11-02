@@ -12,7 +12,7 @@ VoiceAI Transcriber is a web application designed to assist healthcare professio
 
 ## Restrictions and Important Information
 1. **Healthcare Professional Use Only**: This tool is intended for use by licensed healthcare professionals. It is designed to assist in creating medical notes but does not replace professional medical judgment.
-2. **AI Limitations**: The AI model may not always produce accurate or complete information. It can hallucinate, omit improtant information etc. Users must review and verify all transcriptions and generated notes.
+2. **AI Limitations**: The AI model may not always produce accurate or complete information. It can hallucinate, omit important information etc. Users must review and verify all transcriptions and generated notes.
 3. **Privacy and Security**: Users are responsible for complying with all applicable privacy laws and regulations, such as HIPAA in the United States. Ensure that this tool can be used in your region and institution before using it.
 4. **Not a Diagnostic Tool**: This tool should not be used for making medical diagnoses or treatment recommendations. It only assists with documentation.
 5. **User Responsibility**: The healthcare professional is solely responsible for the accuracy and completeness of the medical notes. All AI-generated content must be reviewed and edited before incorporation into official medical records.
